@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  api:
+    build: ./server
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mysql
+    environment:
+      - PORT=5000
+      - DB_URL=mysql://root:password@mysql:3306/mbti
+
+  client:
+    build: ./client
+    ports:
+      - '3000:1234'
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://localhost:5000/api
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'mbti'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '7000:3306'
+    expose:
+      - '7000'
+    volumes:
+      - api-db:/var/lib/mysql
+
+volumes:
+  api-db:
